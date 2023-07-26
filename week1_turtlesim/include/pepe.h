@@ -1,0 +1,47 @@
+
+
+#include "ros/ros.h"
+#include "geometry_msgs/Twist.h"
+#include "turtlesim/Pose.h"
+#include "std_msgs/Bool.h"
+#include <std_srvs/Empty.h>
+#include <turtlesim/Kill.h>
+#include <turtlesim/Spawn.h>
+#include <sstream>
+
+class Pepe
+{
+    public:
+        Pepe(ros::NodeHandle* n);
+        void driving_test(void);
+        
+    private:
+        ros::NodeHandle* n_;
+        ros::Subscriber trigger_sub;
+        ros::Publisher twist_pub;
+        ros::ServiceClient clear;
+        ros::ServiceClient kill;
+        ros::ServiceClient spawn;
+
+        bool first_start;
+        bool mission1;
+        bool pepe_reset;
+        bool mission2;
+
+        bool stop;
+        int count, it_angle, it_length, it_circle;
+        double angle[5] = {90, 135, -90, 135, 90};
+        double length[6] = {2.5, 2.5, 3.0, 3.0, 2.5, 2.5};
+        double w, theta, t;
+
+        void initializeSubscribers(); 
+        void initializePublishers();
+        void initializeServices();
+        void triggerCallback(const std_msgs::Bool::ConstPtr& trigger);
+
+        void move(ros::Publisher twist_pub, double linear, double angular);
+        void forward(ros::Publisher twist_pub, double length);
+        void rotate(ros::Publisher twist_pub, double angle);
+        void make_circle(ros::Publisher twist_pub, double angular);
+        void ready_for_next_pepe(void);
+};
