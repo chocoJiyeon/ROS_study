@@ -3,12 +3,14 @@
 #include <tf/transform_listener.h>
 #include "sensor_msgs/LaserScan.h"
 #include <sensor_msgs/PointCloud2.h>
+#include <sensor_msgs/point_cloud_conversion.h>
 #include "laser_geometry/laser_geometry.h"
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_types.h>
 
 
-sensor_msgs::PointCloud cloud1,cloud2, scan1, scan2;
+sensor_msgs::PointCloud cloud1,cloud2, scan1, scan2, cloud_cam, scan_cam;
+sensor_msgs::PointCloud2 scan_cam2;
 geometry_msgs::PointStamped front_laser_point, rear_laser_point, depth_camera_point;
 geometry_msgs::PointStamped base_point1, base_point2, base_point3;
 
@@ -53,7 +55,9 @@ void Scan::scan2CallBack(const sensor_msgs::LaserScan::ConstPtr& scan_r)
 
 void Scan::depthImgCallback(const sensor_msgs::PointCloud2ConstPtr depth_msg)
 {
-
+    sensor_msgs::convertPointCloud2ToPointCloud(*depth_msg, cloud_cam);
+    sensor_msgs::convertPointCloudToPointCloud2(scan_cam, scan_cam2);
+    cam_pub.publish(scan_cam2);
 }
 
 void transformPoint(const tf::TransformListener& listener)
@@ -88,6 +92,22 @@ void transformPoint(const tf::TransformListener& listener)
         scan2.points[i].x = base_point2.point.x;
         scan2.points[i].y = base_point2.point.y;
         scan2.points[i].z = base_point2.point.z;
+    }
+
+    depth_camera_point.header.frame_id = "depth_camera";
+    depth_camera_point.header.stamp = ros::Time();
+    int range3 = cloud_cam.points.size();
+    scan_cam = cloud_cam;
+    scan_cam.header.frame_id = "base_link";
+    for(int i=0; i<range3; i++)
+    {
+        depth_camera_point.point.x = cloud_cam.points[i].x;
+        depth_camera_point.point.y = cloud_cam.points[i].y;
+        depth_camera_point.point.z = cloud_cam.points[i].z;
+        listener.transformPoint("base_link", depth_camera_point, base_point3);
+        scan_cam.points[i].x = base_point3.point.x;
+        scan_cam.points[i].y = base_point3.point.y;
+        scan_cam.points[i].z = base_point3.point.z;
     }
 }
 
