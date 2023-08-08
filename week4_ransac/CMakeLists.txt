@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  geometry_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -213,3 +214,7 @@ find_package(OpenCV)
 add_executable(ransac_line src/ransac_line.cpp)
 add_dependencies(ransac_line ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(ransac_line ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(laser_based_grid_map src/laser_based_grid_map.cpp)
+add_dependencies(laser_based_grid_map ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(laser_based_grid_map ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
