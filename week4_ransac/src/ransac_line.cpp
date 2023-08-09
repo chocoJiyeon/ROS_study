@@ -3,8 +3,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include <vector>
 
-int num_of_edge = 300, num_of_it = 50, max_inlier_size = 30;
-double tolerance = 3.0;
+int num_of_edge = 300, num_of_it = 22, max_inlier_size = 0;
+double tolerance = 4.0;
 std::pair<int,int> line[2];
 std::vector<std::pair<int,int>> edge;
 
@@ -14,7 +14,8 @@ void random_point(cv::Mat dataset)
     for(int i =0; i<num_of_edge; i++)
     {
         c = rand()%500;
-        if(i%5 ==1) x = rand()%100 - 50; else if (i%5 ==2) x = rand()%60 - 30; else x = rand()%20 -10;
+        if(i%5 ==1) x = rand()%100 - 50; else if (i%5 ==2) x = rand()%60 - 30; 
+        else if(i%5 ==3) x = rand()%20 - 10; else x = rand()%4 -2;
         r = c/2 + 150 + x;
         if(dataset.at<uchar>(r,c))    i--;
         else  
