@@ -218,3 +218,7 @@ target_link_libraries(ransac_line ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 add_executable(laser_based_grid_map src/laser_based_grid_map.cpp)
 add_dependencies(laser_based_grid_map ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(laser_based_grid_map ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+
+add_executable(lidar_ransac src/lidar_ransac.cpp)
+add_dependencies(lidar_ransac ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(lidar_ransac ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
