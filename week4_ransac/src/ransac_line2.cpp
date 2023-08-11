@@ -5,7 +5,6 @@
 
 int num_of_edge = 300, num_of_it = 22, max_inlier_size = 50;
 double tolerance = 4.0;
-std::pair<int,int> line[2];
 std::vector<std::pair<int,int>> edge;
 
 void random_point(cv::Mat dataset)
@@ -37,22 +36,37 @@ void mean_value(std::vector<std::pair<int,int>>* inlier, float* mean_r, float* m
     *mean_c /= inlier->size();
 }
 
-void save_line(std::vector<std::pair<int,int>>* inlier)
+float cal_rmse(std::vector<std::pair<int,int>>* inlier, float* m, float* n)
 {
-    float mean_r, mean_c, m, y, mh = 0, md = 0, rmse = 0;
+    float rmse = 0;
+    for(auto it : *inlier)
+    {
+        rmse += abs(*m*it.first - it.second + *n)/std::sqrt(pow(*m,2)+ pow(*n,2));
+    } 
+    rmse /= inlier->size();
+    return std::sqrt(rmse);
+}
+
+void save_line(std::vector<std::pair<int,int>>* inlier, std::vector<float*>* line)
+{
+    float mean_r, mean_c, mh = 0, md = 0;
+    float *line_info = new float[3];
     mean_value(inlier, &mean_r, &mean_c);
     for(auto it : *inlier)
     {
         mh += (it.first - mean_r)*(it.second - mean_c);
         md += (it.first - mean_r)*(it.first - mean_r);
     }
-    m = mh/md;
-    y = mean_c - m*mean_r;
-    // line : r = m*c + y
-
+    line_info[0] = mh/md;
+    line_info[1] = mean_c - line_info[0]*mean_r;
+    // line : c = m*r + n
+    line_info[2] = cal_rmse(inlier, &line_info[0], &line_info[1]);
+    line->push_back(line_info);
 }
-void ransac()
+void ransac(cv::Mat* result_img)
 {
+    std::vector<float*> line;
+    int min_error = 999, min_it;
     for(int i=0; i< num_of_it; i++)
     {
         std::vector<std::pair<int,int>> inlier;
@@ -83,12 +97,22 @@ void ransac()
         }
         if(inlier.size() > max_inlier_size)
         {
-            save_line(&inlier);
-            // max_inlier_size = cnt;
-            // line[0].first = a1;     line[0].second = b1;
-            // line[1].first = a2;     line[1].second = b2;
+            save_line(&inlier, &line);
         }
     }
+    for(int i =0; i< line.size(); i++)
+    {
+        if(line.at(i)[2] < min_error)
+        {
+            min_error = line.at(i)[2];
+            min_it = i;
+        }
+    }
+    cv::line(*result_img, 
+                cv::Point(499,(int)((499-line.at(min_it)[1])/line.at(min_it)[0])), 
+                cv::Point(0,(int)(-line.at(min_it)[1]/line.at(min_it)[0])), 
+                cv::Scalar::all(255));
+
 }//ransac()
 
 int main(int argc, char** argv)
@@ -101,12 +125,9 @@ int main(int argc, char** argv)
     random_point(dataset);
     // cv::imshow("initial img",dataset);
 
-    ransac();
     cv::Mat result_img;
     dataset.copyTo(result_img);
-    float m = (float)(line[1].second - line[0].second)/(float)(line[1].first-line[0].first);
-    cv::line(result_img, cv::Point(499, (int)((499-line[0].second)/m) +line[0].first), cv::Point(0, (int)(-line[0].second/m) +line[0].first), cv::Scalar::all(255));
-    // cv::line(result_img, cv::Point(line[0].second, line[0].first), cv::Point(line[1].second, line[1].first), cv::Scalar::all(255));
+    ransac(&result_img);
 
     cv::imshow("result img",result_img);
     cv::waitKey(0); 
