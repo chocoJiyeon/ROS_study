@@ -13,16 +13,16 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "camera_calibration");  
   ros::NodeHandle n;
 
-  std::vector<cv::String> fileNames;
-  cv::glob("../calibration/Image*.png", fileNames, false);
+  std::vector<cv::String> captured_img;
+  cv::glob("catkin_ws/src/jy_project/computervision_ex/src/original_images/cap_img*.png", captured_img, false);
   cv::Size patternSize(11 - 1, 8 - 1);
-  std::vector<std::vector<cv::Point2f>> q(capture_img.size());
+  std::vector<std::vector<cv::Point2f>> q(captured_img.size());
 
   std::vector<std::vector<cv::Point3f>> Q;
-  // 1. Generate checkerboard (world) coordinates Q. The board has 25 x 18
-  // fields with a size of 15x15mm
+  // 1. Generate checkerboard (world) coordinates Q. The board has 11 x 8
+  // fields with a size of 25x25mm
 
-  int checkerBoard[2] = {9,7};
+  int checkerBoard[2] = {11,8};
   // Defining the world coordinates for 3D points
     std::vector<cv::Point3f> objp;
     for(int i = 1; i<checkerBoard[1]; i++){
@@ -33,68 +33,70 @@ int main(int argc, char **argv)
 
   std::vector<cv::Point2f> imgPoint;
   // Detect feature points
-  for(int i=0; i<capture_img.size(); i++)
+  std::size_t i = 0;
+  for (auto const &f : captured_img) 
   {
-    cv::Mat img = capture_img[i];
-    std::string win_name = "original " + std::to_string(i);
-    cv::imshow(win_name, img);
+    std::cout << std::string(f) << std::endl;
+
     // 2. Read in the image an call cv::findChessboardCorners()
-    // cv::Mat gray;
- 
-    // cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
-    // bool patternFound = cv::findChessboardCorners(gray, patternSize, q[i], cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+    cv::Mat img = cv::imread(captured_img[i]);
+    cv::Mat gray;
+    // std::cout<<img.rows<<'\t'<<img.cols<<'\n';
 
-    // // 2. Use cv::cornerSubPix() to refine the found corner detections
-    // if(patternFound){
-    //     cv::cornerSubPix(gray, q[i],cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
-    //     Q.push_back(objp);
-    // }
+    cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
 
-    // // Display
-    // cv::drawChessboardCorners(img, patternSize, q[i], patternFound);
-    // cv::imshow("chessboard detection", img);
+    bool patternFound = cv::findChessboardCorners(gray, patternSize, q[i], cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
+
+    // 2. Use cv::cornerSubPix() to refine the found corner detections
+    if(patternFound)
+    {
+        cv::cornerSubPix(gray, q[i],cv::Size(11,11), cv::Size(-1,-1), cv::TermCriteria(cv::TermCriteria::EPS + cv::TermCriteria::MAX_ITER, 30, 0.1));
+        Q.push_back(objp);
+    }
+
+    // Display
+    cv::drawChessboardCorners(img, patternSize, q[i], patternFound);
+    cv::imshow("chessboard detection", img);
     cv::waitKey(0);
+
+    i++;
   }
   cv::destroyAllWindows();
 
-  // cv::Matx33f K(cv::Matx33f::eye());  // intrinsic camera matrix
-  // cv::Vec<float, 5> k(0, 0, 0, 0, 0); // distortion coefficients
+  cv::Matx33f K(cv::Matx33f::eye());  // intrinsic camera matrix
+  cv::Vec<float, 5> k(0, 0, 0, 0, 0); // distortion coefficients
 
-  // std::vector<cv::Mat> rvecs, tvecs;
-  // std::vector<double> stdIntrinsics, stdExtrinsics, perViewErrors;
-  // int flags = cv::CALIB_FIX_ASPECT_RATIO + cv::CALIB_FIX_K3 +
-  //             cv::CALIB_ZERO_TANGENT_DIST + cv::CALIB_FIX_PRINCIPAL_POINT;
-  // cv::Size frameSize(1440, 1080);
+  std::vector<cv::Mat> rvecs, tvecs;
+  std::vector<double> stdIntrinsics, stdExtrinsics, perViewErrors;
+  int flags = cv::CALIB_FIX_ASPECT_RATIO + cv::CALIB_FIX_K3 +  cv::CALIB_ZERO_TANGENT_DIST + cv::CALIB_FIX_PRINCIPAL_POINT;
+  cv::Size frameSize(1280, 720);
 
-  // std::cout << "Calibrating..." << std::endl;
-  // // 4. Call "float error = cv::calibrateCamera()" with the input coordinates
-  // // and output parameters as declared above...
+  std::cout << "Calibrating..." << std::endl;
+  // 4. Call "float error = cv::calibrateCamera()" with the input coordinates
+  // and output parameters as declared above...
 
-  // float error = cv::calibrateCamera(Q, q, frameSize, K, k, rvecs, tvecs, flags);
+  float error = cv::calibrateCamera(Q, q, frameSize, K, k, rvecs, tvecs, flags);
 
-  // std::cout << "Reprojection error = " << error << "\nK =\n"
-  //           << K << "\nk=\n"
-  //           << k << std::endl;
+  std::cout << "Reprojection error = " << error << "\nK(camera matrix) =\n" << K << "\nk(distortion coefficients)=\n" << k << std::endl;
 
-  // // Precompute lens correction interpolation
-  // cv::Mat mapX, mapY;
-  // cv::initUndistortRectifyMap(K, k, cv::Matx33f::eye(), K, frameSize, CV_32FC1,
-  //                             mapX, mapY);
+  // Precompute lens correction interpolation
+  cv::Mat mapX, mapY;
+  cv::initUndistortRectifyMap(K, k, cv::Matx33f::eye(), K, frameSize, CV_32FC1, mapX, mapY);
 
-  // // Show lens corrected images
-  // for (auto const &f : fileNames) {
-  //   std::cout << std::string(f) << std::endl;
+  // Show lens corrected images
+  for (auto const &f : captured_img) {
+    std::cout << std::string(f) << std::endl;
 
-  //   cv::Mat img = cv::imread(f, cv::IMREAD_COLOR);
+    cv::Mat img = cv::imread(f, cv::IMREAD_COLOR);
 
-  //   cv::Mat imgUndistorted;
-  //   // 5. Remap the image using the precomputed interpolation maps.
-  //   cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
+    cv::Mat imgUndistorted;
+    // 5. Remap the image using the precomputed interpolation maps.
+    cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
 
-  //   // Display
-  //   cv::imshow("undistorted image", imgUndistorted);
-  //   cv::waitKey(0);
-  // }
+    // Display
+    cv::imshow("undistorted image", imgUndistorted);
+    cv::waitKey(0);
+  }
 
   return 0;
 }
