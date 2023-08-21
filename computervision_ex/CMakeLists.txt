@@ -214,6 +214,9 @@ find_package(OpenCV)
 set(list 
   camera_calibration
   capture_images
+  result_of_calibration
+  aruco_maker_detection
+
 )
 
 foreach(loopVar ${list})

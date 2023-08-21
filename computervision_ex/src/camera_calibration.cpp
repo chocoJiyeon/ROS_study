@@ -14,7 +14,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   std::vector<cv::String> captured_img;
-  cv::glob("catkin_ws/src/jy_project/computervision_ex/src/original_images/cap_img*.png", captured_img, false);
+  cv::glob("catkin_ws/src/jy_project/computervision_ex/src/original_images4/cap_img*.png", captured_img, false);
   cv::Size patternSize(11 - 1, 8 - 1);
   std::vector<std::vector<cv::Point2f>> q(captured_img.size());
 
@@ -56,8 +56,8 @@ int main(int argc, char **argv)
 
     // Display
     cv::drawChessboardCorners(img, patternSize, q[i], patternFound);
-    cv::imshow("chessboard detection", img);
-    cv::waitKey(0);
+    // cv::imshow("chessboard detection", img);
+    // cv::waitKey(0);
 
     i++;
   }
@@ -72,8 +72,7 @@ int main(int argc, char **argv)
   cv::Size frameSize(1280, 720);
 
   std::cout << "Calibrating..." << std::endl;
-  // 4. Call "float error = cv::calibrateCamera()" with the input coordinates
-  // and output parameters as declared above...
+  // 4. Call "float error = cv::calibrateCamera()" with the input coordinates and output parameters as declared above...
 
   float error = cv::calibrateCamera(Q, q, frameSize, K, k, rvecs, tvecs, flags);
 
@@ -94,6 +93,7 @@ int main(int argc, char **argv)
     cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
 
     // Display
+    cv::imshow("original image", img);
     cv::imshow("undistorted image", imgUndistorted);
     cv::waitKey(0);
   }
