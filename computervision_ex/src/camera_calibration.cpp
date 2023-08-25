@@ -14,13 +14,12 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   std::vector<cv::String> captured_img;
-  cv::glob("catkin_ws/src/jy_project/computervision_ex/src/original_images4/cap_img*.png", captured_img, false);
+  cv::glob("/home/cona/catkin_ws/src/jy_project/computervision_ex/src/original_images4/cap_img*.png", captured_img, false);
   cv::Size patternSize(11 - 1, 8 - 1);
   std::vector<std::vector<cv::Point2f>> q(captured_img.size());
 
   std::vector<std::vector<cv::Point3f>> Q;
-  // 1. Generate checkerboard (world) coordinates Q. The board has 11 x 8
-  // fields with a size of 25x25mm
+  // 1. Generate checkerboard (world) coordinates Q. The board has 11 x 8 fields with a size of 25x25mm
 
   int checkerBoard[2] = {11,8};
   // Defining the world coordinates for 3D points
@@ -41,8 +40,6 @@ int main(int argc, char **argv)
     // 2. Read in the image an call cv::findChessboardCorners()
     cv::Mat img = cv::imread(captured_img[i]);
     cv::Mat gray;
-    // std::cout<<img.rows<<'\t'<<img.cols<<'\n';
-
     cv::cvtColor(img, gray, cv::COLOR_RGB2GRAY);
 
     bool patternFound = cv::findChessboardCorners(gray, patternSize, q[i], cv::CALIB_CB_ADAPTIVE_THRESH + cv::CALIB_CB_NORMALIZE_IMAGE + cv::CALIB_CB_FAST_CHECK);
@@ -91,11 +88,10 @@ int main(int argc, char **argv)
     cv::Mat imgUndistorted;
     // 5. Remap the image using the precomputed interpolation maps.
     cv::remap(img, imgUndistorted, mapX, mapY, cv::INTER_LINEAR);
-
     // Display
-    cv::imshow("original image", img);
-    cv::imshow("undistorted image", imgUndistorted);
-    cv::waitKey(0);
+    // cv::imshow("original image", img);
+    // cv::imshow("undistorted image", imgUndistorted);
+    // cv::waitKey(0);
   }
 
   return 0;

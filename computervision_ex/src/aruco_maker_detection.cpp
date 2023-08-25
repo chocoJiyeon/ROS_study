@@ -18,11 +18,12 @@ int main(int argc, char **argv)
   
   cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
   cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
+  //dictionary size : number of markers
 
-  cv::Matx33f cameraMatrix(795.35846, 0, 639.5,
-                0, 795.35846, 359.5,
-                0, 0, 1);
-  cv::Vec<float, 5> distCoeffs(-0.285412, 0.0766505, 0, 0, 1);
+  cv::Matx33f cameraMatrix(795.358459, 0, 639.5,
+                            0, 795.358459, 359.5,
+                            0, 0, 1);
+  cv::Vec<float, 5> distCoeffs(-0.285411835, 0.0766505376, 0, 0, 0);
   std::vector<cv::Vec3d> rvecs, tvecs;
 
   ros::Rate rate(30);
@@ -34,9 +35,14 @@ int main(int argc, char **argv)
       
       std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
       cv::aruco::detectMarkers(img, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
-      cv::aruco::drawDetectedMarkers(img, markerCorners, markerIds);
-      cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
-      std::cout<<tvecs[0]*100<<'\n';
+      if(markerIds.size())
+      {
+        cv::aruco::drawDetectedMarkers(img, markerCorners, markerIds);
+        cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
+        cv::drawFrameAxes(img, cameraMatrix, distCoeffs, rvecs[0], tvecs[0], 0.1);
+        std::cout<<"[x, y, z] = "<<tvecs[0]*100<<"\t\t"<<"[roll pitch yaw] ="<<rvecs[0]<<'\n';
+      }
+      
 
       cv::imshow("img", img);
       cv::waitKey(1);
