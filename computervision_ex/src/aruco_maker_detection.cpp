@@ -3,6 +3,8 @@
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/aruco.hpp>
 
+using namespace std;
+
 int main(int argc, char **argv) 
 {
   ros::init(argc, argv, "aruco_maker_detection");  
@@ -11,6 +13,10 @@ int main(int argc, char **argv)
   cv::startWindowThread();
   cv::VideoCapture cap(0);
   if(!cap.isOpened()) return 1;
+
+  std::cout<<fixed;
+  std::cout.precision(3);
+  std::cout.setf(ios::showpos);
 
   cv::Mat img;
 
@@ -38,9 +44,9 @@ int main(int argc, char **argv)
       if(markerIds.size())
       {
         cv::aruco::drawDetectedMarkers(img, markerCorners, markerIds);
-        cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
-        cv::drawFrameAxes(img, cameraMatrix, distCoeffs, rvecs[0], tvecs[0], 0.1);
-        std::cout<<"[x, y, z] = "<<tvecs[0]*100<<"\t\t"<<"[roll pitch yaw] ="<<rvecs[0]<<'\n';
+        cv::aruco::estimatePoseSingleMarkers(markerCorners, 0.07, cameraMatrix, distCoeffs, rvecs, tvecs);
+        cv::aruco::drawAxis(img, cameraMatrix, distCoeffs, rvecs[0], tvecs[0], 0.1);
+        std::cout<<"[x, y, z] = "<<tvecs[0]*100<<"     "<<"[yaw pitch roll] ="<<rvecs[0]*180/3.141592<<'\n';
       }
       
 
