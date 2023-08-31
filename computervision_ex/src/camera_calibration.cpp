@@ -14,7 +14,7 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   std::vector<cv::String> captured_img;
-  cv::glob("/home/cona/catkin_ws/src/jy_project/computervision_ex/src/original_images4/cap_img*.png", captured_img, false);
+  cv::glob("/home/cona/catkin_ws/src/jy_project/computervision_ex/images/original_images4/cap_img*.png", captured_img, false);
   cv::Size patternSize(11 - 1, 8 - 1);
   std::vector<std::vector<cv::Point2f>> q(captured_img.size());
 

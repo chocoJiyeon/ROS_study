@@ -14,9 +14,11 @@ set(CMAKE_CXX_FLAGS "-O0 -DDEBUG -std=c++11")
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
+  image_transport
   roscpp
   rospy
   std_msgs
+  image_geometry
 )
 
 ## System dependencies are found with CMake's conventions
@@ -111,7 +113,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ComputerVision_ex
- CATKIN_DEPENDS cv_bridge roscpp rospy std_msgs
+ CATKIN_DEPENDS cv_bridge image_transport roscpp rospy std_msgs image_geometry
 #  DEPENDS system_lib
 )
 
@@ -125,6 +127,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  ${PCL_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -213,6 +216,7 @@ include_directories(
 # catkin_add_nosetests(test)
 
 find_package(OpenCV)
+FIND_PACKAGE (PCL) 
 # add_executable(camera_calibration src/camera_calibration.cpp)
 # add_dependencies(camera_calibration ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 # target_link_libraries(camera_calibration ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
@@ -221,12 +225,13 @@ set(list
   capture_images
   result_of_calibration
   aruco_maker_detection
+  depth_image_to_laser_scan
 
 )
 
 foreach(loopVar ${list})
   add_executable(${loopVar} src/${loopVar}.cpp)
   add_dependencies(${loopVar} ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-  target_link_libraries(${loopVar} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+  target_link_libraries(${loopVar} ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} )
 endforeach(loopVar ${list})
 
