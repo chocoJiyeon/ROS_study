@@ -75,28 +75,25 @@ void convert(const sensor_msgs::ImageConstPtr& depth_msg, const image_geometry::
   const float center_x = cam_model.cx();
   const float center_y = cam_model.cy() - scan_h;
 
-  // Combine unit conversion (if necessary) with scaling by focal length for computing (X,Y)
-  const double unit_scaling = toMeters( T(1) );
-  const float constant_x = unit_scaling / cam_model.fx();
-
   const T* depth_row = reinterpret_cast<const T*>(&depth_msg->data[0]);
   const int row_step = depth_msg->step / sizeof(T); //image.step : row length in bytes
 
   const int offset = (int)(center_y - scan_height/2);
   depth_row += offset*row_step; // Offset to center of image
 
+  float min_r = INFINITY;
   for(int v = offset; v < offset+scan_height_; ++v, depth_row += row_step)
   {
     for (int u = 0; u < (int)depth_msg->width; ++u) // Loop over each pixel in row
     {
       const T depth = depth_row[u];
       double r = depth; // Assign to pass through NaNs and Infs
-      const double th = -atan2((double)(u - center_x) * constant_x, unit_scaling); // Atan2(x, z), but depth divides out
+      const double th = -atan2((double)(u - center_x) / cam_model.fx(), 1);
       const int index = (th - scan_msg->angle_min) / scan_msg->angle_increment;
 
       if (valid(depth))
       { // Not NaN or Inf // Calculate in XYZ
-        double x = (u - center_x) * depth * constant_x;
+        double x = toMeters( T((u - center_x) * depth / cam_model.fx()) );
         double z = toMeters(depth);
         // Calculate actual distance 빗변 길이
         r = hypot(x, z);
@@ -106,10 +103,12 @@ void convert(const sensor_msgs::ImageConstPtr& depth_msg, const image_geometry::
       if(use_point(r, scan_msg->ranges[index], scan_msg->range_min, scan_msg->range_max))
       {
         scan_msg->ranges[index] = r;
-        std::cout<<"obstacle!!\n";
+        if(r < min_r) min_r = r;
+        // std::cout<<"obstacle!!\n";
       }
     }//for u (cols)
   }//for v (rows)
+  std::cout<<min_r<<'\n';
 }//convert
 
 void depthImgCallback(const sensor_msgs::ImageConstPtr& depth_msg, const sensor_msgs::CameraInfoConstPtr& info_msg)
