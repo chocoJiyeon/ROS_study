@@ -9,7 +9,6 @@
 #include <sensor_msgs/LaserScan.h>
 #include <boost/make_shared.hpp>
 
-// std::string output_frame_id_ = "camera_depth_frame";
 int scan_height_ = 1, scan_h = 0.0;
 double scan_time_ = 0.033, range_max_ = 5.0, range_min_ = 0.45;
 
@@ -92,7 +91,7 @@ void convert(const sensor_msgs::ImageConstPtr& depth_msg, const image_geometry::
 
       if (valid(depth))
       { // Not NaN or Inf // Calculate in XYZ
-        double x = toMeters( T((u - center_x) * depth / cam_model.fx()) );
+        double x = (u - center_x) * toMeters( T(depth/cam_model.fx()) ) ;
         double z = toMeters(depth);
         // Calculate actual distance 빗변 길이
         r = hypot(x, z);

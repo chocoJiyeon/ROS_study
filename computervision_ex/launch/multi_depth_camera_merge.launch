@@ -21,8 +21,8 @@
         <arg name="serial_number" value="$(arg camera2_serila_number)"/>
         <arg name="device_num" value="$(arg device_num)"/>
     </include>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="camera_tf1"  args="0 0.5 0 0 0 0 base_link camera_01_link"/>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="camera_tf2"  args="0 -0.5 0 0 0 0 base_link camera_02_link"/>
+    <!-- <node pkg="tf2_ros" type="static_transform_publisher" name="camera_tf1"  args="0 0.5 0 0 0 0 base_link camera_01_link"/>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="camera_tf2"  args="0 -0.5 0 0 0 0 base_link camera_02_link"/> -->
 
     <!-- urdf tf -->
     <arg name="model" default="$(find computervision_ex)/urdf/multi_astra_camera.urdf"/>
@@ -30,7 +30,7 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
 
     <!-- run multi_depthimg_to_laserscan.cpp -->
-    <node pkg="computervision_ex" type="multi_depthimg_to_laserscan" name="depth_image_to_laser_scan" />
+    <node pkg="computervision_ex" type="multi_depthimg_to_laserscan" name="depth_image_to_laser_scan" output="screen"/>
 
     <!-- ira laser tools - laserscan multi merger.cpp  -->
     <node pkg="ira_laser_tools" type="laserscan_multi_merger" name="laserscan_multi_merger" />

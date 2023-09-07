@@ -93,7 +93,7 @@ void convert(const sensor_msgs::ImageConstPtr& depth_msg, const image_geometry::
 
       if (valid(depth))
       { // Not NaN or Inf // Calculate in XYZ
-        double x = toMeters( T((u - center_x) * depth / cam_model.fx()) );
+        double x = (u - center_x) * toMeters( T(depth/cam_model.fx()) ) ;
         double z = toMeters(depth);
         // Calculate actual distance 빗변 길이
         r = hypot(x, z);
