@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<robot name="robot">
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <box size="0.5 1 0.2"/>
+      </geometry>
+    </visual>   
+  </link>
+
+  <link name="camera_01_link">
+    <visual>
+      <geometry>
+        <box size="0.01 0.06 0.02"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>   
+  </link>
+
+  <joint name="base_to_depth_cam1" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_01_link"/>
+    <origin rpy="0 0 0" xyz="0 -0.5 0"/>
+  </joint>
+
+  <link name="camera_02_link">
+    <visual>
+      <geometry>
+        <box size="0.01 0.06 0.02"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+    </visual>   
+  </link>
+
+  <joint name="base_to_depth_cam2" type="fixed">
+    <parent link="base_link"/>
+    <child link="camera_02_link"/>
+    <origin rpy="0 0 0" xyz="0 0.5 0"/>
+  </joint>
+</robot>

@@ -19,7 +19,10 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   image_geometry
+  tf
+  urdf
 )
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -113,7 +116,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ComputerVision_ex
- CATKIN_DEPENDS cv_bridge image_transport roscpp rospy std_msgs image_geometry
+ CATKIN_DEPENDS cv_bridge image_transport roscpp rospy std_msgs image_geometry tf urdf 
 #  DEPENDS system_lib
 )
 
@@ -127,6 +130,7 @@ include_directories(
   include
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  ${EIGEN_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
 )
 
@@ -217,6 +221,7 @@ include_directories(
 
 find_package(OpenCV)
 FIND_PACKAGE (PCL) 
+find_package(Eigen3 REQUIRED)
 # add_executable(camera_calibration src/camera_calibration.cpp)
 # add_dependencies(camera_calibration ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 # target_link_libraries(camera_calibration ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
@@ -225,8 +230,9 @@ set(list
   capture_images
   result_of_calibration
   aruco_maker_detection
-  depth_image_to_laser_scan
 
+  depth_image_to_laser_scan
+  multi_depthimg_to_laserscan
 )
 
 foreach(loopVar ${list})
