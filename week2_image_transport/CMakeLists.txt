@@ -230,10 +230,6 @@ add_executable(compressed_img_sub src/compressed_img_sub.cpp)
 add_dependencies(compressed_img_sub ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(compressed_img_sub ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
 
-add_executable(depth_img_pub src/depth_img_pub.cpp)
-add_dependencies(depth_img_pub ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
-target_link_libraries(depth_img_pub ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES})
-
 # Mark executables and/or libraries for installation
 install(TARGETS image_publisher
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
