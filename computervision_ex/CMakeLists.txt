@@ -233,6 +233,8 @@ set(list
 
   depth_image_to_laser_scan
   multi_depthimg_to_laserscan
+
+  pointcloud2
 )
 
 foreach(loopVar ${list})
