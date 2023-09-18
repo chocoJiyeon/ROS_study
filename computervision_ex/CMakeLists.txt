@@ -235,6 +235,7 @@ set(list
   multi_depthimg_to_laserscan
 
   pointcloud2
+  image_feature_point_matching
 )
 
 foreach(loopVar ${list})
