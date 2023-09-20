@@ -9,8 +9,8 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "image_feature_point_matching");  
   ros::NodeHandle n;
 
-  cv::Mat srcImage1 = cv::imread("/home/cona/catkin_ws/src/jy_project/computervision_ex/images/keypoint_image/snack.jpg", cv::IMREAD_GRAYSCALE);
-  cv::Mat srcImage2 = cv::imread("/home/cona/catkin_ws/src/jy_project/computervision_ex/images/keypoint_image/eye.jpg", cv::IMREAD_GRAYSCALE);
+  cv::Mat srcImage1 = cv::imread("/home/cona/catkin_ws/src/jy_project/computervision_ex/images/keypoint_image/snack.jpg", cv::IMREAD_GRAYSCALE);  //큰 이미지
+  cv::Mat srcImage2 = cv::imread("/home/cona/catkin_ws/src/jy_project/computervision_ex/images/keypoint_image/eye.jpg", cv::IMREAD_GRAYSCALE);    //찾을 작은 이미지
   if(srcImage1.empty() || srcImage2.empty())  return -1;
 
   //detect the keypoints & descriptors
@@ -18,12 +18,12 @@ int main(int argc, char **argv)
   cv::Mat descriptors1, descriptors2;
 
   cv::Ptr<cv::ORB> orbF = cv::ORB::create(1000);
-  orbF->detectAndCompute(srcImage1, cv::noArray(), keypoints1, descriptors1);
+  orbF->detectAndCompute(srcImage1, cv::noArray(), keypoints1, descriptors1); //(input image, mask, keypoint, descriptors)
   orbF->detectAndCompute(srcImage2, cv::noArray(), keypoints2, descriptors2);
   std::cout<<"ketpoints1.size() = "<<keypoints1.size()<<std::endl;
 
   // matching descriptor vectors (using flannIndex.knnSearch)
-  int k = 2;
+  int k = 2;  //num of nearest neighbors to search for
   cv::Mat indices, dists;
   cv::flann::Index flannIndex(descriptors1, cv::flann::LshIndexParams(12,20,2), cvflann::FLANN_DIST_HAMMING);
   flannIndex.knnSearch(descriptors2, indices, dists, k, cv::flann::SearchParams());
