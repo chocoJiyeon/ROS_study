@@ -248,13 +248,14 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   image_transport::ImageTransport it(n);
 
-  ros::Rate rate(5);
-  while(n.ok())
-  {
-    image_transport::CameraSubscriber cam_sub1 = it.subscribeCamera("/camera_01/depth/image_raw", 1, depthImgCallback1);
+image_transport::CameraSubscriber cam_sub1 = it.subscribeCamera("/camera_01/depth/image_raw", 1, depthImgCallback1);
     image_transport::CameraSubscriber cam_sub2 = it.subscribeCamera("/camera_02/depth/image_raw", 1, depthImgCallback2);
     scan_pub1 = n.advertise<sensor_msgs::LaserScan>("scan1",10);
     scan_pub2 = n.advertise<sensor_msgs::LaserScan>("scan2",10);
+  ros::Rate rate(5);
+  while(n.ok())
+  {
+    
 
     ros::spin();
     rate.sleep();
